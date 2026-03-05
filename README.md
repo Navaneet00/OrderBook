@@ -129,50 +129,38 @@ This structure guarantees:
 
 ### Order Management
 
-addOrder(Order)
-Adds a new order to the correct price level.
+addOrder(Order) - Adds a new order to the correct price level.
 
-cancelOrder(orderId)
-Cancels an order safely with mutex protection.
+cancelOrder(orderId) - Cancels an order safely with mutex protection.
 
 ---
 
 ### Market Data
 
-getBestBid()
-Returns the highest buy price currently in the book.
+getBestBid() - Returns the highest buy price currently in the book.
 
-getBestAsk()
-Returns the lowest sell price currently in the book.
+getBestAsk() - Returns the lowest sell price currently in the book.
 
-printBook()
-Displays the current state of the order book.
+printBook() - Displays the current state of the order book.
 
 ---
 
 ### Matching Engine
 
-Executes trades when **BestBid ≥ BestAsk**
-
-Handles partial fills
-
-Updates trade history with price, quantity, buyer/seller IDs, and timestamp
-
-Measures latency per match in nanoseconds
+* Executes trades when **BestBid ≥ BestAsk**
+* Handles partial fills
+* Updates trade history with price, quantity, buyer/seller IDs, and timestamp
+* Measures latency per match in nanoseconds
 
 ---
 
 ### Thread Safety
 
-**OrderBook** protected by **std::mutex**
-
-**producer** thread generates orders
-
-**matching engine** runs in a separate thread
-
-**std::atomic<bool>** flag to stop threads safely
-
-Zero race conditions — all operations are thread-safe
+* **OrderBook** protected by **std::mutex**
+* **producer** thread generates orders
+* **matching engine** runs in a separate thread
+* **std::atomic<bool>** flag to stop threads safely
+* Zero race conditions — all operations are thread-safe
 
 ---
 
@@ -180,6 +168,7 @@ Zero race conditions — all operations are thread-safe
 
 **Example output from a 5-second simulation:**
 
+```
 Producer runtime: 5 seconds.
 
 Benchmark Report
@@ -190,23 +179,22 @@ Throughput: 610,722 trades / sec
 Average Match Latency: 227 ns
 Best Bid: 102
 Best Ask: 103
+```
 
-**Throughput:** Orders processed per second
-
-**Average Match Latency:** Time per trade match in nanoseconds
-
-**Trade History:** Full log for analysis
+* **Throughput:** Orders processed per second
+* **Average Match Latency:** Time per trade match in nanoseconds
+* **Trade History:** Full log for analysis
 
 ---
 
 # Future Improvements
 
-Multiple producer threads
-Real-time market order support
-Persistent logs / replay
-Lock-free optimizations for ultra-low latency
-Min/Max latency reporting
-Graphical or ASCII visualization of order book depth
+* Multiple producer threads
+* Real-time market order support
+* Persistent logs / replay
+* Lock-free optimizations for ultra-low latency
+* Min/Max latency reporting
+* Graphical or ASCII visualization of order book depth
 
 ---
 
