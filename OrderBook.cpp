@@ -3,47 +3,56 @@
 using namespace std;
 
 void OrderBook::addOrder(const Order& order){
+    lock_guard<mutex> lock(bookMutex);
+
     if(order.side == Side::BID){
-        bids[order.price].push(order);
+        bids[order.price].push_back(order);
     }
     else{
-        asks[order.price].push(order);
+        asks[order.price].push_back(order);
     }
+    orderIndex[order.orderId] = {order.side, order.price};
 }
 
 void OrderBook::cancelOrder(uint64_t orderId){
+    lock_guard<mutex> lock(bookMutex);
 
-    // Search bids
-    for (auto& [price, q] : bids){
-        queue<Order> temp;
+    if(orderIndex.find(orderId) == orderIndex.end()) { return; }
 
-        while(!q.empty()){
-            Order o = q.front();
-            q.pop();
+    auto [side, price] = orderIndex[orderId];
 
-            if(o.orderId != orderId){
-                temp.push(o);
+    if(side == Side::BID){
+        auto& book = bids;
+        auto& dq = book[price];
+
+        for(auto it = dq.begin(); it != dq.end(); it++){
+            if(it->orderId == orderId){
+                dq.erase(it);
+                break;
             }
         }
 
-        q = move(temp);
+        if(dq.empty()){
+            book.erase(price);
+        }
     }
+    else{
+        auto& book = asks;
+        auto& dq = book[price];
 
-    // Search asks
-    for (auto& [price, q] : asks){
-        queue<Order> temp;
-
-        while(!q.empty()){
-            Order o = q.front();
-            q.pop();
-
-            if(o.orderId != orderId){
-                temp.push(o);
+        for(auto it = dq.begin(); it != dq.end(); it++){
+            if(it->orderId == orderId){
+                dq.erase(it);
+                break;
             }
         }
 
-        q = move(temp);
+        if(dq.empty()){
+            book.erase(price);
+        }
     }
+
+    orderIndex.erase(orderId);
 }
 
 double OrderBook::getBestBid() const{
@@ -63,14 +72,14 @@ void OrderBook::printBook() const{
     cout << "----- Order Book -----" << endl;
     cout << "Bids: " << endl;
 
-    for (auto& [price, q] : bids){
-        cout << "Price: " << price << " | Orders: " << q.size() << endl;
+    for (auto& [price, orders] : bids){
+        cout << "Price: " << price << " | Orders: " << orders.size() << endl;
     }
 
     cout << endl << "Asks: " << endl;
 
-    for (auto& [price, q] : asks){
-        cout << "Price: " << price << " | Orders: " << q.size() << endl;
+    for (auto& [price, orders] : asks){
+        cout << "Price: " << price << " | Orders: " << orders.size() << endl;
     }
 
     cout << "---------------" << endl;
