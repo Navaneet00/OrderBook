@@ -32,12 +32,19 @@ a **trade match occurs**, and the order matching engine executes the trade.
 OrderBook/
 
 ├── main.cpp              # Entry point / simulation runner
+
 ├── Trade.h               # Trade structure definition
+
 ├── Order.h               # Order structure definition
+
 ├── OrderBook.h           # OrderBook class interface
+
 ├── OrderBook.cpp         # OrderBook implementation
+
 ├── MatchingEngine.h      # Matching engine declaration
+
 ├── MatchingEngine.cpp    # Matching engine implementation
+
 └── README.md             # Project documentation
 
 ---
