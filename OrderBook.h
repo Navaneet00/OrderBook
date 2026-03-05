@@ -23,7 +23,7 @@ class OrderBook{
     unordered_map<uint64_t, pair<Side, double>> orderIndex;
 
     // Book mutex
-    mutex bookMutex;
+    mutable mutex bookMutex;
 
     // Add Order
     void addOrder(const Order& order);

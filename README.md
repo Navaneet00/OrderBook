@@ -2,9 +2,9 @@
 
 A **high-performance C++ implementation of a Limit Order Book**, similar to the core infrastructure used in modern electronic exchanges and high-frequency trading systems.
 
-This project simulates how financial markets manage **buy and sell orders**, maintain price levels, and prepare orders for matching.
+This project simulates how financial markets manage **buy and sell orders**, maintain price levels, and execute trades via a **matching engine**.
 
-The focus is on **data structures, performance, and system design**, using modern C++ and STL containers.
+The focus is on **data structures, performance, and system design**, using modern C++ and STL containers, along with **thread safety and benchmarking**.
 
 ---
 
@@ -17,7 +17,7 @@ Market participants submit two types of orders:
 * **Bid (Buy Order)** — willing to buy at a specific price
 * **Ask (Sell Order)** — willing to sell at a specific price
 
-Orders are organized by **price levels** and **time priority**.
+Orders are organized by **price levels** and **time priority** (first-in, first-out within each price).
 
 When:
 
@@ -32,10 +32,55 @@ a **trade match occurs**, and the order matching engine executes the trade.
 OrderBook/
 
 ├── main.cpp              # Entry point / simulation runner
+├── Trade.h               # Trade structure definition
 ├── Order.h               # Order structure definition
 ├── OrderBook.h           # OrderBook class interface
 ├── OrderBook.cpp         # OrderBook implementation
-└── MatchingEngine.h      # Matching logic (future expansion)
+├── MatchingEngine.h      # Matching engine declaration
+├── MatchingEngine.cpp    # Matching engine implementation
+└── README.md             # Project documentation
+
+---
+
+# Architecture Overview
+
+       ┌───────────────────────┐
+       │   Producer Thread     │
+       │ Generates random BIDs │
+       │   and ASKs orders     │
+       └───────────┬───────────┘
+                   │
+                   ▼
+       ┌────────────────────────┐
+       │  Thread-Safe OrderBook │
+       │ ┌───────────┐ ┌──────┐ │
+       │ │   BIDS    │ │ ASKS │ │
+       │ │   100 ↑   │ │ 98 ↓ │ │
+       │ │   101 ↑   │ │ 99 ↓ │ │
+       │ │   102 ↑   │ │ 100↓ │ │
+       │ └───────────┘ └──────┘ │
+       └───────────┬────────────┘
+                   │
+                   ▼
+       ┌────────────────────────┐
+       │ Matching Engine Thread │
+       │ Executes trades when   │
+       │ BestBid ≥ BestAsk      │
+       │ Updates Trade History  │
+       └───────────┬────────────┘
+                   │
+                   ▼
+       ┌─────────────────────────┐
+       │ Trade History           │
+       │ Records executed trades │
+       │ Price, Quantity, IDs    │
+       │ Latency per match       │
+       └─────────────────────────┘
+
+- **BIDS ladder**: Highest price at top → FIFO execution at each level
+- **ASKS ladder**: Highest price at top → FIFO execution at each level
+- **Threads**: Producer and Matching Engine threads run concurrently
+- **Trade History**: logs all executed trades with latency for analysis.
 
 ---
 
@@ -47,7 +92,7 @@ Each order contains:
 * **side** — BID or ASK
 * **price** — limit price
 * **quantity** — number of shares/contracts
-* **timestamp** — nanosecond precision for time priority
+* **timestamp** — relative time in nanoseconds (for latency and time priority)
 
 This mirrors how real trading systems maintain **price-time priority**.
 
@@ -73,8 +118,8 @@ std::map<double, std::queue<Order>>
 
 This structure guarantees:
 
-* **O(log N)** price level insertion
-* **O(1)** order access within a level
+* **O(log N)** insertion for new price levels
+* **O(1)** access to first order in each level
 * Efficient best bid/ask retrieval
 
 ---
@@ -87,7 +132,7 @@ addOrder(Order)
 Adds a new order to the correct price level.
 
 cancelOrder(orderId)
-Removes an order from the book.
+Cancels an order safely with mutex protection.
 
 ---
 
@@ -104,25 +149,63 @@ Displays the current state of the order book.
 
 ---
 
-# Design Goals
+### Matching Engine
 
-* Use **modern C++**
-* Emphasize **cache-friendly data structures**
-* Maintain **price-time priority**
-* Prepare architecture for a **matching engine**
+Executes trades when **BestBid ≥ BestAsk**
+
+Handles partial fills
+
+Updates trade history with price, quantity, buyer/seller IDs, and timestamp
+
+Measures latency per match in nanoseconds
+
+---
+
+### Thread Safety
+
+**OrderBook** protected by **std::mutex**
+
+**producer** thread generates orders
+
+**matching engine** runs in a separate thread
+
+**std::atomic<bool>** flag to stop threads safely
+
+Zero race conditions — all operations are thread-safe
+
+---
+
+### Benchmarking
+
+**Example output from a 5-second simulation:**
+
+Producer runtime: 5 seconds.
+
+Benchmark Report
+-----------------
+Total Trades: 3,053,610
+Total Volume: 9,245,611
+Throughput: 610,722 trades / sec
+Average Match Latency: 227 ns
+Best Bid: 102
+Best Ask: 103
+
+**Throughput:** Orders processed per second
+
+**Average Match Latency:** Time per trade match in nanoseconds
+
+**Trade History:** Full log for analysis
 
 ---
 
 # Future Improvements
 
-Matching engine implementation
-Trade execution logic
-Order modification support
-Latency measurement
-Lock-free structures for multithreading
-Persistence / replay logs
-Market order support
-Performance benchmarking
+Multiple producer threads
+Real-time market order support
+Persistent logs / replay
+Lock-free optimizations for ultra-low latency
+Min/Max latency reporting
+Graphical or ASCII visualization of order book depth
 
 ---
 
@@ -135,10 +218,12 @@ This project helps understand concepts used in:
 * Low-latency C++ systems
 * Financial market microstructure
 * Concurrent system design
+* Thread-safe data structures
+* Performance benchmarking
 
 ---
 
-# Example
+# Example Book
 
 Buy Orders (Bids)
 
@@ -156,7 +241,7 @@ Sell Orders (Asks)
 | 102.5 | 250      |
 | 103.0 | 400      |
 
-If a **bid ≥ ask**, the matching engine executes a trade.
+If a **bid ≥ ask**, the matching engine executes a trade, updating the book and trade history.
 
 ---
 
@@ -164,7 +249,7 @@ If a **bid ≥ ask**, the matching engine executes a trade.
 
 Compile with:
 
-g++ -std=c++17 main.cpp OrderBook.cpp -o orderbook
+g++ -std=c++17 main.cpp OrderBook.cpp MatchingEngine.cpp -o orderbook -pthread
 
 Run:
 
@@ -174,4 +259,4 @@ Run:
 
 # Author
 
-Built as part of a **systems programming and trading infrastructure learning project** focusing on **C++ performance engineering and exchange architecture**.
+Built as part of a **systems programming and trading infrastructure learning project**, focusing on **C++ performance engineering, concurrency, and exchange architecture**.

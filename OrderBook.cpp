@@ -56,18 +56,23 @@ void OrderBook::cancelOrder(uint64_t orderId){
 }
 
 double OrderBook::getBestBid() const{
+    lock_guard<mutex> lock(bookMutex);
+
     if(bids.empty()){ return 0; }
 
     return bids.begin()->first;
 }
 
 double OrderBook::getBestAsk() const{
+    lock_guard<mutex> lock(bookMutex);
+
     if(asks.empty()) { return 0; }
 
     return asks.begin()->first;
 }
 
 void OrderBook::printBook() const{
+    lock_guard<mutex> lock(bookMutex);
 
     cout << "----- Order Book -----" << endl;
     cout << "Bids: " << endl;

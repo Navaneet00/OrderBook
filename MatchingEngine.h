@@ -4,6 +4,8 @@
 #include "Trade.h"
 #include "OrderBook.h"
 #include <cstdint>
+#include <thread>
+#include <atomic>
 
 class MatchingEngine{
     private:
@@ -11,6 +13,13 @@ class MatchingEngine{
     vector<long long> latencyLog;
 
     public:
+    atomic<bool> running = true;
+
+    // Start matching orders
+    void start(OrderBook& book);
+
+    // Stop matching orders
+    void stop();
 
     // Match orders
     void matchOrders(OrderBook& book);
@@ -23,6 +32,9 @@ class MatchingEngine{
 
     // Get Average Latency
     double getAverageLatency() const;
+
+    // Get Total Trades
+    uint64_t getTotalTrades() const;
 };
 
 #endif

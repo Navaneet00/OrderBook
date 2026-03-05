@@ -4,6 +4,8 @@
 using namespace std;
 
 void MatchingEngine::matchOrders(OrderBook& book){
+    std::lock_guard<std::mutex> lock(book.bookMutex);
+    
     while(!book.bids.empty() && !book.asks.empty()){
 
         auto start = chrono::high_resolution_clock::now();
@@ -57,10 +59,14 @@ const vector<Trade>& MatchingEngine::getTradeHistory() const{
     return tradeHistory;
 }
 
+uint64_t MatchingEngine::getTotalTrades() const{
+    return tradeHistory.size();
+}
+
 uint64_t MatchingEngine::getTotalVolume() const{
     uint64_t total = 0;
 
-    for(Trade trade : tradeHistory){
+    for(const Trade& trade : tradeHistory){
         total += trade.quantity;
     }
     
@@ -77,4 +83,15 @@ double MatchingEngine::getAverageLatency() const {
     }
 
     return (double)(sum / latencyLog.size());
+}
+
+void MatchingEngine::start(OrderBook& book){
+    while(running){
+        matchOrders(book);
+        this_thread::sleep_for(chrono::microseconds(50));
+    }
+}
+
+void MatchingEngine::stop(){
+    running = false;
 }
