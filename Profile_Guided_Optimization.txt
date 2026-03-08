@@ -1,0 +1,43 @@
+"navaneet@Buddy:/mnt/c/Users/Navaneet/Desktop/Imp_Doc/Other Projects/Cpp/OrderBook$ g++ -O3 -fprofile-generate -std=c++17 main.cpp OrderBook.cpp MatchingEngine.cpp -o orderbook
+navaneet@Buddy:/mnt/c/Users/Navaneet/Desktop/Imp_Doc/Other Projects/Cpp/OrderBook$ ./orderbook
+
+Matching Engine Started...
+Matching Engine Stopped!
+Producer runtime: 4 seconds.
+Benchmark Report
+-----------------
+Total Trades: 4373124
+Total Volume: 13231852
+Throughput: 874624 trades / sec
+Average Match Latency: 241 ns.
+Best Bid: 110
+Best Ask: 95
+
+
+
+navaneet@Buddy:/mnt/c/Users/Navaneet/Desktop/Imp_Doc/Other Projects/Cpp/OrderBook$ ls
+MatchingEngine.cpp  OrderBook.cpp  Trade.h        orderbook                      orderbook-main.gcda
+MatchingEngine.h    OrderBook.h    benchmark.txt  orderbook-MatchingEngine.gcda  orderbook.exe
+Order.h             README.md      main.cpp       orderbook-OrderBook.gcda       trace.txt
+
+
+
+navaneet@Buddy:/mnt/c/Users/Navaneet/Desktop/Imp_Doc/Other Projects/Cpp/OrderBook$ g++ -O3 -fprofile-use -std=c++17 main
+.cpp OrderBook.cpp MatchingEngine.cpp -o orderbook
+navaneet@Buddy:/mnt/c/Users/Navaneet/Desktop/Imp_Doc/Other Projects/Cpp/OrderBook$ ./orderbook
+
+Matching Engine Started...
+Matching Engine Stopped!
+Producer runtime: 4 seconds.
+Benchmark Report
+-----------------
+Total Trades: 4945729
+Total Volume: 14960025
+Throughput: 989145 trades / sec
+Average Match Latency: 316 ns.
+Best Bid: 102
+Best Ask: 103
+
+
+
+- Throughput increased: 874k → 989k trades/sec ≈ +13% improvement

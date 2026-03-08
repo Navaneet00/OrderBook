@@ -90,6 +90,8 @@ int main(){
     OrderBook book;
     MatchingEngine engine;
 
+    cout << "Matching Engine Started..." << endl;
+
     thread matcher([&](){
         engine.start(book, running);
     });
@@ -122,6 +124,7 @@ int main(){
 
         auto runtime = chrono::duration_cast<chrono::seconds>(end-start).count();
 
+        cout << "Matching Engine Stopped!" << endl;
         cout << "Producer runtime: " << runtime << " seconds." << endl;
     });
 
