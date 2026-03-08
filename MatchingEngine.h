@@ -13,13 +13,12 @@ class MatchingEngine{
     vector<long long> latencyLog;
 
     public:
-    atomic<bool> running = true;
 
     // Start matching orders
-    void start(OrderBook& book);
+    void start(OrderBook& book, atomic<bool>& running);
 
-    // Stop matching orders
-    void stop();
+    // // Stop matching orders
+    // void stop();
 
     // Match orders
     void matchOrders(OrderBook& book);

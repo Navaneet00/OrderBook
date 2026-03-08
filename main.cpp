@@ -5,6 +5,7 @@
 #include <random>
 #include <atomic>
 #include <chrono>
+#include <signal.h>
 using namespace std;
 
 // // Old version
@@ -70,18 +71,27 @@ using namespace std;
 
 
 
+atomic<bool> running(true);
+
+// Signal Handler
+void signalHandler(int signal){
+    if(signal == SIGINT){
+        std::cout << "\nCaught Ctrl+C, shutting down gracefully..." << std::endl;
+        running.store(false);
+    }
+}
 
 
 // New Version
 int main(){
 
+    signal(SIGINT, signalHandler);
+
     OrderBook book;
     MatchingEngine engine;
 
-    atomic<bool> running = true;
-
     thread matcher([&](){
-        engine.start(book);
+        engine.start(book, running);
     });
 
     thread producer([&](){
@@ -117,9 +127,7 @@ int main(){
 
     this_thread::sleep_for(chrono::seconds(5));
 
-    running = false;
-
-    engine.stop();
+    running.store(false);
 
     producer.join();
     matcher.join();

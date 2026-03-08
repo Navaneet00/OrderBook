@@ -85,13 +85,13 @@ double MatchingEngine::getAverageLatency() const {
     return (double)(sum / latencyLog.size());
 }
 
-void MatchingEngine::start(OrderBook& book){
-    while(running){
+void MatchingEngine::start(OrderBook& book, atomic<bool>& running){
+    while(running.load(memory_order_relaxed)){
         matchOrders(book);
         this_thread::sleep_for(chrono::microseconds(50));
     }
 }
 
-void MatchingEngine::stop(){
-    running = false;
-}
+// void MatchingEngine::stop(){
+//     running = false;
+// }
