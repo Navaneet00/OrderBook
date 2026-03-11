@@ -1,0 +1,65 @@
+
+# Compiled binaries
+
+orderbook
+
+orderbook.exe
+
+# PGO artifacts
+
+*.gcda
+
+*.gcno
+
+*.gcov
+
+Profile_Guided_Optimization.txt
+
+# Perf / flamegraph artifacts
+
+perf.data
+
+perf.data.old
+
+out.perf
+
+out.folded
+
+# Benchmark & trace logs
+
+benchmark.txt
+
+trace.txt
+
+# Build directories
+
+build/
+
+cmake-build-debug/
+
+cmake-build-release/
+
+# IDE
+
+.vscode/
+
+.idea/
+
+*.code-workspace
+
+# OS
+
+.DS_Store
+
+Thumbs.db
+
+# Compiler intermediates
+
+*.o
+
+*.a
+
+*.so
+
+*.out
+
