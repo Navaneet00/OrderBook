@@ -147,3 +147,17 @@ int main(){
 
     return 0;
 }
+
+
+
+// Example output from a 5-second simulation:
+
+// Producer runtime: 5 seconds.
+// Benchmark Report
+// -----------------
+// Total Trades: 3,053,610
+// Total Volume: 9,245,611
+// Throughput: 610,722 trades / sec
+// Average Match Latency: 227 ns
+// Best Bid: 102
+// Best Ask: 103
