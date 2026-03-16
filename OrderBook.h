@@ -6,6 +6,7 @@
 #include <deque>
 #include "Order.h"
 #include <mutex>
+#include <atomic>
 #include <functional>
 using namespace std;
 

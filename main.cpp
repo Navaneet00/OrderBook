@@ -161,3 +161,17 @@ int main(){
 // Average Match Latency: 227 ns
 // Best Bid: 102
 // Best Ask: 103
+
+
+
+// After applying -O3 compiler flag (g++ -std=c++17 -O3  main.cpp OrderBook.cpp MatchingEngine.cpp -o orderbook)
+
+// Producer runtime: 5 seconds.
+// Benchmark Report
+// -----------------
+// Total Trades: 6,017,147
+// Total Volume: 18,210,151
+// Throughput: 12,03,429 trades / sec
+// Average Match Latency: 143 ns.
+// Best Bid: 102
+// Best Ask: 103
