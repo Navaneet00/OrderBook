@@ -171,7 +171,7 @@ int main(){
 // -----------------
 // Total Trades: 6,017,147
 // Total Volume: 18,210,151
-// Throughput: 12,03,429 trades / sec
+// Throughput: 1,203,429 trades / sec
 // Average Match Latency: 143 ns.
 // Best Bid: 102
 // Best Ask: 103
